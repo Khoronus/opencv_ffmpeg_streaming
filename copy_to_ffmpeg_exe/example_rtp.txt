@@ -1,0 +1,1 @@
+ffplay -i foo.sdp -protocol_whitelist file,sdp,rtp,udp

@@ -15,16 +15,12 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -std=c++11 -Wall -O0 -fno-o
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -std=c++11 -Wall -O0 -fno-omit-frame-pointer ")
 
 find_package(OpenCV REQUIRED)
-find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets Test Concurrent)
 
 #find_package(Qt5Core)
 
-get_target_property(QtCore_location Qt5::Core /usr/lib/x86_64-linux-gnu/)
-
-
 include(CMakeToolsHelpers OPTIONAL)
 
-include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(${OpenCV_INCLUDE_DIRS} "D:\workspace\programs\ThirdPartyLib\ffmpeg-20190926-525de95-win64-dev\include")
 
 add_subdirectory(streamer)
 
@@ -39,7 +35,7 @@ find_library(SWSCALE_LIBRARY swscale)
 MESSAGE(${AVFORMAT_LIBRARY})
 
 
-target_link_libraries(simple_opencv_streaming  streamer ${OpenCV_LIBS} ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY} ${SWSCALE_LIBRARY} Qt5::Core)
+target_link_libraries(simple_opencv_streaming  streamer ${OpenCV_LIBS} ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY} ${SWSCALE_LIBRARY})
 #target_link_libraries(simple_opencv_streaming avcodec avformat avutil swscale avfilter avdevice)
 
 

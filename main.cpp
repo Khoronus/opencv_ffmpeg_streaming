@@ -1,10 +1,12 @@
 #include "streamer/streamer.hpp"
 
+#include <chrono>
+#include <thread>
 #include <string>
 #include <opencv2/opencv.hpp>
 #include <cstdio>
 #include <cstdlib>
-#include <unistd.h>
+//#include <unistd.h>
 #include <chrono>
 
 using namespace streamer;
@@ -67,7 +69,8 @@ static void add_delay(size_t streamed_frames, size_t fps, double elapsed, double
         printf("frame %07lu adding delay %.4f\n", streamed_frames, delay);
         printf("avg fps = %.2f\n", streamed_frames/elapsed);
 #endif
-        usleep(dexcess*avg_frame_time*1000000.0);
+		//usleep(dexcess*avg_frame_time*1000000.0);
+		std::this_thread::sleep_for(std::chrono::microseconds((int)(dexcess*avg_frame_time*1000000.0)));
     }
 }
 
@@ -106,16 +109,19 @@ int main(int argc, char *argv[])
     int cap_fps = video_capture.get(cv::CAP_PROP_FPS);
     printf("video info w = %d, h = %d, fps = %d\n", cap_frame_width, cap_frame_height, cap_fps);
 
-    int stream_fps = cap_fps;
+	int stream_fps = 30;// cap_fps;
 
     int bitrate = 500000;
     Streamer streamer;
     StreamerConfig streamer_config(cap_frame_width, cap_frame_height,
                                    640, 360,
-                                   stream_fps, bitrate, "high444", "rtmp://localhost/live/mystream");
+		stream_fps, bitrate, "high444", "rtp://127.0.0.1:1234");// "rtmp://localhost:8889/live/app"); //"rtmp://localhost/live/mystream"); // rtsp://127.0.0.1:8554/live.sdp
 
+	std::cout << "Log" << std::endl;
     streamer.enable_av_debug_log();
-    streamer.init(streamer_config);
+
+	std::cout << "Init" << std::endl;
+	streamer.init(streamer_config);
 
     size_t streamed_frames = 0;
 
@@ -129,17 +135,21 @@ int main(int argc, char *argv[])
 
     cv::Mat read_frame;
     cv::Mat proc_frame;
+	std::cout << "Capture" << std::endl;
+
     bool ok = video_capture.read(read_frame);
+	std::cout << "ok: " << ok << std::endl;
 
     std::chrono::duration<double> elapsed_time = std::chrono::duration_cast<std::chrono::duration<double>>(time_stop - time_start);
     std::chrono::duration<double> frame_time = std::chrono::duration_cast<std::chrono::duration<double>>(time_stop - time_prev);
 
     while(ok) {
+		std::cout << "process_frame" << std::endl;
         process_frame(read_frame, proc_frame);
         if(!from_camera) {
             streamer.stream_frame(proc_frame);
         } else {
-            streamer.stream_frame(proc_frame, frame_time.count()*streamer.inv_stream_timebase);
+			streamer.stream_frame(proc_frame, 30);// frame_time.count()*streamer.inv_stream_timebase);
         }
 
         time_stop = clk.now();
@@ -155,6 +165,7 @@ int main(int argc, char *argv[])
 
         ok = video_capture.read(read_frame);
         time_prev = time_stop;
+		std::cout << "capture: " << ok << std::endl;
     }
     video_capture.release();
 

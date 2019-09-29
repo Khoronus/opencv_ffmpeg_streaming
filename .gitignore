@@ -1,0 +1,27 @@
+# Binary build files and folders
+build/
+exe/
+bin/
+obj/
+.vs/
+binary/
+database/
+__pycache__/
+ckpt/
+
+# Specific files
+src/to_compile/configure/path_configuration.txt
+src/to_compile/configure/path_configuration_python.bat
+src/build_result.txt
+src/Selection/MarkROI/sample/version.hpp
+
+# Specific folders
+src/ActionRecognition/ML/SequenceRecognition/data/
+src/ActionRecognition/ML/SequenceRecognition/model/
+src/ActionRecognition/ML/SequenceRecognition/logs/
+
+# Specific folders files ML
+mlmodels/SensorStereo/DataSets/*
+mlmodels/SensorStereo/Examples/*
+mlmodels/SensorStereo/log/*
+mlmodels/SensorStereo/Output/*

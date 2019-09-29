@@ -69,9 +69,19 @@ public:
         frame = av_frame_alloc();
 
         int sz =  av_image_get_buffer_size(pix_fmt, width, height, align_frame_buffer);
-        int ret = posix_memalign(reinterpret_cast<void**>(&data), align_frame_buffer, sz);
-
-        av_image_fill_arrays(frame->data, frame->linesize, data, pix_fmt, width, height, align_frame_buffer);
+        //int ret = posix_memalign(reinterpret_cast<void**>(&data), align_frame_buffer, sz);
+		int ret = 0;
+		std::cout << "_aligned_malloc: " << align_frame_buffer << " " << sz << std::endl;
+		void *ptr = _aligned_malloc(sz, align_frame_buffer);
+		std::cout << "_done" << std::endl;
+		data = (uint8_t*)(ptr);
+		if (!data) {
+			ret = 1;
+			// OMG: it failed! error is stored in errno.
+		}
+		std::cout << "_done2" << std::endl;
+		
+		av_image_fill_arrays(frame->data, frame->linesize, data, pix_fmt, width, height, align_frame_buffer);
         frame->format = pix_fmt;
         frame->width  = width;
         frame->height = height;

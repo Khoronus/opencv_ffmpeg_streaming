@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 namespace streamer
 {
@@ -42,6 +42,8 @@ static int set_options_and_open_encoder(AVFormatContext *fctx, AVStream *stream,
                                         std::string codec_profile, double width, double height,
                                         int fps, int bitrate, AVCodecID codec_id)
 {
+	std::cout << "set_options_and_open_encoder" << std::endl;
+	std::cout << "fps: " << fps << std::endl;
     const AVRational dst_fps = {fps, 1};
 
     codec_ctx->codec_tag = 0;
@@ -135,12 +137,16 @@ void Streamer::stream_frame(const cv::Mat &image)
 
 void Streamer::stream_frame(const cv::Mat &image, int64_t frame_duration)
 {
+	std::cout << "stream_frame" << std::endl;
     if(can_stream()) {
+		std::cout << "[+] can_stream" << std::endl;
         const int stride[] = {static_cast<int>(image.step[0])};
         sws_scale(scaler.ctx, &image.data, stride, 0, image.rows, picture.frame->data, picture.frame->linesize);
         picture.frame->pts += frame_duration; //time of frame in milliseconds
         encode_and_write_frame(out_codec_ctx, format_ctx, picture.frame);
-    }
+	} else {
+		std::cout << "[-] can_stream" << std::endl;
+	}
 }
 
 
@@ -162,8 +168,9 @@ int Streamer::init(const StreamerConfig &streamer_config)
     }
 
     //initialize format context for output with flv and no filename
-    avformat_alloc_output_context2(&format_ctx, nullptr, "flv", nullptr);
-    if(!format_ctx) {
+    //avformat_alloc_output_context2(&format_ctx, nullptr, "flv", nullptr);
+	avformat_alloc_output_context2(&format_ctx, nullptr, "rtp", nullptr);
+	if(!format_ctx) {
         return 1;
     }
 
@@ -193,6 +200,7 @@ int Streamer::init(const StreamerConfig &streamer_config)
         return 1;
     }
 
+	std::cout << "Hello" << std::endl;
     out_codec_ctx = avcodec_alloc_context3(out_codec);
 
     if(set_options_and_open_encoder(format_ctx, out_stream, out_codec_ctx, out_codec, config.profile,
@@ -204,16 +212,22 @@ int Streamer::init(const StreamerConfig &streamer_config)
     out_stream->codecpar->extradata = static_cast<uint8_t*>(av_mallocz(out_codec_ctx->extradata_size));
     memcpy(out_stream->codecpar->extradata, out_codec_ctx->extradata, out_codec_ctx->extradata_size);
 
+	std::cout << "Hello2" << std::endl;
+
     av_dump_format(format_ctx, 0, config.server.c_str(), 1);
 
-    picture.init(out_codec_ctx->pix_fmt, config.dst_width, config.dst_height);
-    scaler.init(out_codec_ctx, config.src_width, config.src_height,config.dst_width, config.dst_height, SWS_BILINEAR);
+	std::cout << "Hello3" << std::endl;
+	picture.init(out_codec_ctx->pix_fmt, config.dst_width, config.dst_height);
+	std::cout << "Hello4" << std::endl;
+	scaler.init(out_codec_ctx, config.src_width, config.src_height,config.dst_width, config.dst_height, SWS_BILINEAR);
+	std::cout << "Hello5" << std::endl;
 
     if (avformat_write_header(format_ctx, nullptr) < 0)
     {
         fprintf(stderr, "Could not write header!\n");
         return 1;
     }
+	std::cout << "Hello6" << std::endl;
 
     printf("stream time base = %d / %d \n", out_stream->time_base.num, out_stream->time_base.den);
 
