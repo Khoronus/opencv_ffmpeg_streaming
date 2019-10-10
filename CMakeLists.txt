@@ -20,7 +20,7 @@ find_package(OpenCV REQUIRED)
 
 include(CMakeToolsHelpers OPTIONAL)
 
-include_directories(${OpenCV_INCLUDE_DIRS} "D:\workspace\programs\ThirdPartyLib\ffmpeg-20190926-525de95-win64-dev\include")
+include_directories(${OpenCV_INCLUDE_DIRS} "D:/workspace/programs/ThirdPartyLib/ffmpeg-20190926-525de95-win64-dev/include")
 
 add_subdirectory(streamer)
 
