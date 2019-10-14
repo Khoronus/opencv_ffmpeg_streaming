@@ -20,22 +20,39 @@ find_package(OpenCV REQUIRED)
 
 include(CMakeToolsHelpers OPTIONAL)
 
-include_directories(${OpenCV_INCLUDE_DIRS} "D:/workspace/programs/ThirdPartyLib/ffmpeg-20190926-525de95-win64-dev/include")
+include_directories(${OpenCV_INCLUDE_DIRS} 
+  "D:/workspace/programs/ThirdPartyProg/ffmpeg-msvc-build/ffmpeg"
+  "D:/workspace/programs/ThirdPartyProg/ffmpeg-msvc-build/ffmpeg/fftools"
+  "D:/workspace/programs/ThirdPartyLib/SDL2-2.0.10/include"
+  "D:/workspace/university/todai/BirdView3D/src/Memory/SharedMemoryCStyle/code"
+)
 
 add_subdirectory(streamer)
 
-add_executable(simple_opencv_streaming main.cpp)
-
+add_executable(simple_opencv_streaming main.c "D:/workspace/programs/ThirdPartyProg/ffmpeg-msvc-build/FFmpeg/fftools/cmdutils.c")
+target_compile_options(simple_opencv_streaming PRIVATE "/TC")
 
 find_library(AVCODEC_LIBRARY avcodec)
 find_library(AVFORMAT_LIBRARY avformat)
 find_library(AVUTIL_LIBRARY avutil)
 find_library(SWSCALE_LIBRARY swscale)
 
+set(AVLIB 
+  "D:/workspace/programs/ThirdPartyLib/ffmpeg-20190926-525de95-win64-dev/lib/avdevice.lib"
+  "D:/workspace/programs/ThirdPartyLib/ffmpeg-20190926-525de95-win64-dev/lib/swresample.lib"
+  "D:/workspace/programs/ThirdPartyLib/ffmpeg-20190926-525de95-win64-dev/lib/postproc.lib"
+)
+
 MESSAGE(${AVFORMAT_LIBRARY})
 
+set(SDL2LIBRARY 
+  "D:/workspace/programs/ThirdPartyLib/SDL2-2.0.10/lib/x64/sdl2.lib" 
+  "D:/workspace/programs/ThirdPartyLib/SDL2-2.0.10/lib/x64/sdl2main.lib"
+)
 
-target_link_libraries(simple_opencv_streaming  streamer ${OpenCV_LIBS} ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY} ${SWSCALE_LIBRARY})
-#target_link_libraries(simple_opencv_streaming avcodec avformat avutil swscale avfilter avdevice)
+set(SHAREDSTYLE
+  "D:/workspace/university/todai/BirdView3D/src/Memory/SharedMemoryCStyle/build/code/release/SharedMemoryCStyle.lib"
+)
 
-
+target_link_libraries(simple_opencv_streaming  streamer ${OpenCV_LIBS} ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY} ${SWSCALE_LIBRARY} ${AVLIB} ${SDL2LIBRARY} ${SHAREDSTYLE})
+#target_link_libraries(simple_opencv_streaming avcodec avformat avutil swscale avfilter avdevice
